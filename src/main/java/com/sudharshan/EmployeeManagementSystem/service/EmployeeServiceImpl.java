@@ -25,7 +25,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public Employee getEmployeeById(Long id)
     {
         return employeeRepository.findById(id).orElseThrow(
-                ()->new ResourceNotFoundException("Id not Found" + id)
+                ()->new ResourceNotFoundException("Id not Found with " + id)
         );
     }
     public Employee updateEmployee(Long id,Employee employee)
