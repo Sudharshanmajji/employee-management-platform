@@ -5,9 +5,11 @@ import com.sudharshan.EmployeeManagementSystem.entity.Employee;
 import com.sudharshan.EmployeeManagementSystem.service.EmployeeService;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/employees")
@@ -27,15 +29,33 @@ public class EmployeeController {
         Employee savedEmployee=employeeService.addEmployee(employee);
         return modelMapper.map(savedEmployee,EmployeeResponse.class);
     }
-    @GetMapping
-    public List<EmployeeResponse> getAllEmployees() {
+//    @GetMapping
+//    public List<EmployeeResponse> getAllEmployees() {
+//
+//        List<Employee> employees = employeeService.getAllEmployees();
+//
+//        return employees.stream()
+//                .map(employee -> modelMapper.map(employee, EmployeeResponse.class))
+//                .toList();
+//    }
+@GetMapping
+public List<EmployeeResponse> getAllEmployees(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "5") int size,
+        @RequestParam(defaultValue = "name") String sortBy) {
 
-        List<Employee> employees = employeeService.getAllEmployees();
+    Page<Employee> employeePage =employeeService.getAllEmployees(page,size,sortBy);
 
-        return employees.stream()
-                .map(employee -> modelMapper.map(employee, EmployeeResponse.class))
-                .toList();
-    }
+    return employeePage.getContent()
+            .stream()
+            .map(employee ->
+                    modelMapper.map(
+                            employee,
+                           EmployeeResponse.class))
+            .toList();
+}
+
+
     @GetMapping("/{id}")
     public EmployeeResponse getEmployeeById(@PathVariable Long id)
     {
@@ -43,6 +63,16 @@ public class EmployeeController {
 
         return modelMapper.map(employee,EmployeeResponse.class);
     }
+//    @GetMapping
+//
+//        public List<EmployeeResponse> getSortedEmployees(@RequestParam(defaultValue = "name") String sortBy)
+//        {
+//            List<Employee> employees=employeeService.getAllEmployeesSorted(sortBy);
+//
+//            return employees.stream()
+//                    .map(employee ->modelMapper.map(employee,EmployeeResponse.class)).toList();
+//        }
+
     @PutMapping("/{id}")
     public EmployeeResponse updateEmployeeById(
             @PathVariable Long id,

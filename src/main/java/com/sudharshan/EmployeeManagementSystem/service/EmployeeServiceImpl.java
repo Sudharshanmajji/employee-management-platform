@@ -3,6 +3,10 @@ package com.sudharshan.EmployeeManagementSystem.service;
 import com.sudharshan.EmployeeManagementSystem.entity.Employee;
 import com.sudharshan.EmployeeManagementSystem.exception.ResourceNotFoundException;
 import com.sudharshan.EmployeeManagementSystem.repository.EmployeeRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +25,24 @@ public class EmployeeServiceImpl implements EmployeeService {
     public List<Employee> getAllEmployees()
     {
         return employeeRepository.findAll();
+    }
+    public List<Employee> getAllEmployeesSorted(String sortBy)
+    {
+        Sort sort=Sort.by(
+                Sort.Direction.ASC,
+                sortBy
+        );
+        return employeeRepository.findAll(sort);
+    }
+    @Override
+    public Page<Employee> getAllEmployees(int page, int size,String sortBy) {
+
+        Pageable pageable = PageRequest.of(page, size,Sort.by(
+                Sort.Order.asc(sortBy),
+                Sort.Order.asc("name")
+        )
+        );
+        return employeeRepository.findAll(pageable);
     }
     public Employee getEmployeeById(Long id)
     {
